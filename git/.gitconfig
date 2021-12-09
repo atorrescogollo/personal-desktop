@@ -1,0 +1,5 @@
+[user]
+  name = Álvaro Torres Cogollo
+
+[includeif "gitdir:~/git/atorrescogollo/"]
+  path = ~/git/atorrescogollo/.gitconfig
