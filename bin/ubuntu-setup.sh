@@ -42,7 +42,11 @@ EOF
         vim \
         build-essential \
         xclip \
-        gnome-tweak-tool
+        gnome-tweak-tool \
+        ca-certificates \
+        curl \
+        gnupg \
+        lsb-release
 }
 
 function InstallConfigs(){
@@ -124,11 +128,61 @@ EOF
   )
 }
 
+function InstallDocker(){
+  cat << EOF
+
+=========================
+  Installing Docker
+=========================
+EOF
+  command -v docker &> /dev/null \
+    && echo "Docker already installed" \
+    || {
+      curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+      echo \
+          "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu \
+            $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+      sudo apt-get update
+      sudo apt-get install docker-ce docker-ce-cli containerd.io -y
+      sudo usermod -aG docker $(id -un)
+      (
+        set -x
+        grep "^docker" /etc/group
+      )
+    }
+
+  command -v docker-compose &> /dev/null \
+    && echo "Docker Compose already installed" \
+    || {
+      sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+      sudo chmod +x /usr/local/bin/docker-compose
+    }
+}
+
+function InstallVSCode(){
+  cat << EOF
+
+=========================
+  Installing VSCode
+=========================
+EOF
+  command -v code &> /dev/null \
+    && echo "VScode already installed" \
+    || {
+      wget -O /tmp/vscode.deb "https://code.visualstudio.com/sha/download?build=stable&os=linux-deb-x64"
+      sudo dpkg -i /tmp/vscode.deb
+      rm /tmp/vscode.deb
+    }
+}
+
+
 function Main(){
     PrepareRepo
     InstallPkgs
+    InstallDocker
     InstallConfigs
     ConfigureGnome
+    InstallVSCode
 }
 
 Main $@
