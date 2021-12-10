@@ -40,7 +40,9 @@ EOF
     sudo apt-get install -y \
         tmux \
         vim \
-        build-essential
+        build-essential \
+        xclip \
+        gnome-tweak-tool
 }
 
 function InstallConfigs(){
@@ -106,10 +108,27 @@ EOF
         done
 }
 
+function ConfigureGnome(){
+  cat << EOF
+
+=========================
+  Configuring gnome
+=========================
+EOF
+  (
+    set -xe
+    cat ~/git/atorrescogollo/personal-desktop/gnome/gnome-terminal.conf | dconf load /org/gnome/terminal/
+    cat ~/git/atorrescogollo/personal-desktop/gnome/mutter.conf         | dconf load /org/gnome/mutter/
+    cat ~/git/atorrescogollo/personal-desktop/gnome/background.conf     | dconf load /org/gnome/desktop/background/
+    cat ~/git/atorrescogollo/personal-desktop/gnome/screensaver.conf    | dconf load /org/gnome/desktop/screensaver/
+  )
+}
+
 function Main(){
     PrepareRepo
     InstallPkgs
     InstallConfigs
+    ConfigureGnome
 }
 
 Main $@

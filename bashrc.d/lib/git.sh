@@ -14,3 +14,6 @@ function diffxml(){
   fi
   diff --color -u <(xmllint --format "$1") <(xmllint --format "$2" )
 }
+
+alias g="cd ~/git"
+alias t="cd /tmp"
