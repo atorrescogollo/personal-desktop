@@ -47,7 +47,9 @@ EOF
         curl \
         gnupg \
         lsb-release \
-        htop
+        htop \
+        tree \
+        thunderbird
 }
 
 function InstallConfigs(){
@@ -111,6 +113,21 @@ EOF
             ls -la --color=auto ~/git/$profile/.gitconfig
           )
         done
+
+
+    cat << EOF
+
+=========================
+ Configuring thunderbird
+=========================
+EOF
+    [ -L ~/.thunderbird ] \
+      || ln -sf ~/git/atorrescogollo/personal-desktop/thunderbird  ~/.thunderbird
+
+    (
+      set -x
+      ls -la --color=auto ~/.thunderbird
+    )
 }
 
 function ConfigureGnome(){

@@ -1,0 +1,4 @@
+thunderbird/*/*
+#!thunderbird/*/*.json
+!thunderbird/*/user.js
+!thunderbird/*/.gitkeep
