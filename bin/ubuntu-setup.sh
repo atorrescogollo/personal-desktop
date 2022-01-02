@@ -46,7 +46,8 @@ EOF
         ca-certificates \
         curl \
         gnupg \
-        lsb-release
+        lsb-release \
+        htop
 }
 
 function InstallConfigs(){
@@ -122,6 +123,7 @@ EOF
   (
     set -xe
     cat ~/git/atorrescogollo/personal-desktop/gnome/gnome-terminal.conf | dconf load /org/gnome/terminal/
+    cat ~/git/atorrescogollo/personal-desktop/gnome/media-keys.conf     | dconf load /org/gnome/settings-daemon/plugins/media-keys/
     cat ~/git/atorrescogollo/personal-desktop/gnome/mutter.conf         | dconf load /org/gnome/mutter/
     cat ~/git/atorrescogollo/personal-desktop/gnome/background.conf     | dconf load /org/gnome/desktop/background/
     cat ~/git/atorrescogollo/personal-desktop/gnome/screensaver.conf    | dconf load /org/gnome/desktop/screensaver/
