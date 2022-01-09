@@ -41,6 +41,7 @@ EOF
         tmux \
         vim \
         build-essential \
+        python3-venv \
         xclip \
         gnome-tweak-tool \
         ca-certificates \
@@ -50,6 +51,8 @@ EOF
         htop \
         tree \
         thunderbird
+    sudo snap install telegram-desktop
+    sudo snap install slack --classic
 }
 
 function InstallConfigs(){
