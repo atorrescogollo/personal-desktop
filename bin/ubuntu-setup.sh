@@ -53,6 +53,7 @@ EOF
         thunderbird
     sudo snap install telegram-desktop
     sudo snap install slack --classic
+    sudo snap install spotify
 }
 
 function InstallConfigs(){
