@@ -24,6 +24,15 @@ function InstallPkgs(){
     cat << EOF
 
 =========================
+       Apt repos
+=========================
+EOF
+    curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
+    sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
+
+    cat << EOF
+
+=========================
      Apt upgrading
 =========================
 EOF
@@ -50,10 +59,38 @@ EOF
         lsb-release \
         htop \
         tree \
-        thunderbird
+        thunderbird \
+        awscli \
+        rclone \
+        terraform \
+        jq
     sudo snap install telegram-desktop
     sudo snap install slack --classic
     sudo snap install spotify
+
+
+    cat << EOF
+
+==========================
+Install tools from sources
+==========================
+EOF
+    echo "- Terragrunt ..."
+    local TERRAGRUNT_VERSION=$(getGithubLatestRelease "gruntwork-io/terragrunt")
+    sudo curl -sL -o /usr/local/bin/terragrunt_$TERRAGRUNT_VERSION https://github.com/gruntwork-io/terragrunt/releases/download/$TERRAGRUNT_VERSION/terragrunt_linux_amd64
+    sudo chmod 755 /usr/local/bin/terragrunt_$TERRAGRUNT_VERSION
+    sudo ln -vsf terragrunt_$TERRAGRUNT_VERSION /usr/local/bin/terragrunt
+
+    echo "- YQ ..."
+    local YQ_VERSION=$(getGithubLatestRelease "mikefarah/yq")
+    sudo curl -sL -o /usr/local/bin/yq_$YQ_VERSION https://github.com/mikefarah/yq/releases/download/$YQ_VERSION/yq_linux_amd64
+    sudo chmod 755 /usr/local/bin/yq_$YQ_VERSION
+    sudo ln -vsf yq_$YQ_VERSION /usr/local/bin/yq
+}
+
+function getGithubLatestRelease(){
+  local repo="$1" # E.g.: gruntwork-io/terragrunt
+  curl -sL https://api.github.com/repos/$repo/releases | jq -r '.[0].name'
 }
 
 function InstallConfigs(){
