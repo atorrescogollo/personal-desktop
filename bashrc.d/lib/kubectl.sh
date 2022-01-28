@@ -9,3 +9,11 @@ command -v kind &> /dev/null \
 command -v kubectl &> /dev/null \
   && alias k=kubectl \
   && complete -F __start_kubectl k
+
+alias k=kubectl
+source <(kubectl completion bash)
+complete -F __start_kubectl k
+
+# https://krew.sigs.k8s.io/docs/user-guide/setup/install/
+[ -d "$HOME/.krew" ] \
+    && export PATH="$HOME/.krew/bin:$PATH"

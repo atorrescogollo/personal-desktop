@@ -67,6 +67,7 @@ EOF
     sudo snap install telegram-desktop
     sudo snap install slack --classic
     sudo snap install spotify
+    sudo snap install dyff
 
 
     cat << EOF
@@ -86,6 +87,33 @@ EOF
     sudo curl -sL -o /usr/local/bin/yq_$YQ_VERSION https://github.com/mikefarah/yq/releases/download/$YQ_VERSION/yq_linux_amd64
     sudo chmod 755 /usr/local/bin/yq_$YQ_VERSION
     sudo ln -vsf yq_$YQ_VERSION /usr/local/bin/yq
+
+    echo "- kubectl-krew ..."
+    # https://krew.sigs.k8s.io/docs/user-guide/setup/install/
+    (
+      set -x; cd "$(mktemp -d)" &&
+      OS="$(uname | tr '[:upper:]' '[:lower:]')" &&
+      ARCH="$(uname -m | sed -e 's/x86_64/amd64/' -e 's/\(arm\)\(64\)\?.*/\1\2/' -e 's/aarch64$/arm64/')" &&
+      KREW="krew-${OS}_${ARCH}" &&
+      curl -fsSLO "https://github.com/kubernetes-sigs/krew/releases/latest/download/${KREW}.tar.gz" &&
+      tar zxvf "${KREW}.tar.gz" &&
+      ./"${KREW}" install krew
+    )
+    ! command -v kubectl-krew &> /dev/null && export PATH="$HOME/.krew/bin:$PATH"
+
+    echo "- kubectl-slice ..."
+    # https://github.com/patrickdappollonio/kubectl-slice#using-krew
+    kubectl krew install slice
+
+
+    cat << EOF
+
+================================
+Ensure execution of custom-tools
+================================
+EOF
+    find "$HOME/git/atorrescogollo/personal-desktop/custom-tools" -mindepth 1 -maxdepth 1 \
+      -exec chmod -vv 755 {} \;
 }
 
 function getGithubLatestRelease(){

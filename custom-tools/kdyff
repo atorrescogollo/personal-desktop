@@ -1,0 +1,71 @@
+#!/usr/bin/env bash
+
+set -eo pipefail
+
+TMPDIR=$(mktemp -d)
+trap "rm -rf $TMPDIR" EXIT
+
+color_reset()  { echo -n -e "\e[39m"; }
+color_red()    { echo -n -e "\e[31m"; }
+color_green()  { echo -n -e "\e[32m"; }
+color_yellow() { echo -n -e "\e[33m"; }
+
+stderr() { echo "$@" >&2; }
+
+stderr_green() {
+  color_green >&2
+  echo "$@" >&2
+  color_reset >&2
+}
+
+stderr_red() {
+  color_red >&2
+  echo "$@" >&2
+  color_reset >&2
+}
+
+stderr_yellow() {
+  color_yellow >&2
+  echo "$@" >&2
+  color_reset >&2
+}
+
+
+function usage(){
+    color_yellow >&2
+    echo >&2
+    echo "Usage:" >&2
+    echo " -> $0 <manifest1.yaml> <manifest2.yaml>" >&2
+    echo >&2
+    color_reset >&2
+}
+
+function main(){
+
+    if ! command -v dyff &>/dev/null; then
+        stderr_red "ERR: dyff is not in the PATH. Check this: https://github.com/homeport/dyff"
+    fi
+    if ! command -v kubectl-slice &>/dev/null; then
+        stderr_red "ERR: kubectl-slice is not in the PATH. Check this: https://github.com/patrickdappollonio/kubectl-slice"
+    fi
+
+    local f1=$( realpath "$1" )
+    local f2=$( realpath "$2" )
+    if [ "$f1" == "" -o "$f2" == "" ]; then
+        stderr_red "ERR: You must include two parameters"
+        usage
+        exit 1
+    fi
+
+    f1basename=$(echo -n "$f1" | sed 's|/|__|g')
+    f2basename=$(echo -n "$f2" | sed 's|/|__|g')
+
+    mkdir "$TMPDIR/$f1basename"
+    kubectl-slice -f "$f1" -o "$TMPDIR/$f1basename" &> /dev/null
+    mkdir "$TMPDIR/$f2basename"
+    kubectl-slice -f "$f2" -o "$TMPDIR/$f2basename" &> /dev/null
+    cd "$TMPDIR"
+    dyff between --omit-header --set-exit-code "$f1basename" "$f2basename"
+}
+
+main $@
