@@ -44,21 +44,23 @@ function main(){
 
     if ! command -v dyff &>/dev/null; then
         stderr_red "ERR: dyff is not in the PATH. Check this: https://github.com/homeport/dyff"
+        exit 1
     fi
     if ! command -v kubectl-slice &>/dev/null; then
         stderr_red "ERR: kubectl-slice is not in the PATH. Check this: https://github.com/patrickdappollonio/kubectl-slice"
+        exit 1
     fi
 
-    local f1=$( realpath "$1" )
-    local f2=$( realpath "$2" )
-    if [ "$f1" == "" -o "$f2" == "" ]; then
+    if [ "$1" == "" -o "$2" == "" ]; then
         stderr_red "ERR: You must include two parameters"
         usage
         exit 1
     fi
 
-    f1basename=$(echo -n "$f1" | sed 's|/|__|g')
-    f2basename=$(echo -n "$f2" | sed 's|/|__|g')
+    local f1=$( realpath "$1" )
+    local f2=$( realpath "$2" )
+    local f1basename=$(echo -n "$f1" | sed 's|/|__|g')
+    local f2basename=$(echo -n "$f2" | sed 's|/|__|g')
 
     mkdir "$TMPDIR/$f1basename"
     kubectl-slice -f "$f1" -o "$TMPDIR/$f1basename" &> /dev/null
